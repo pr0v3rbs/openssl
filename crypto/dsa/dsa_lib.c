@@ -21,6 +21,11 @@ DSA *DSA_new(void)
     return DSA_new_method(NULL);
 }
 
+void DSA_set_mode(DSA* dsa, int type)
+{
+    dsa->type = type;
+}
+
 int DSA_set_method(DSA *dsa, const DSA_METHOD *meth)
 {
     /*
@@ -55,6 +60,7 @@ DSA *DSA_new_method(ENGINE *engine)
         return NULL;
     }
 
+    ret->type = kDSA;
     ret->references = 1;
     ret->lock = CRYPTO_THREAD_lock_new();
     if (ret->lock == NULL) {

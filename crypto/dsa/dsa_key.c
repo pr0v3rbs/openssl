@@ -42,25 +42,41 @@ static int dsa_builtin_keygen(DSA *dsa)
             goto err;
     while (BN_is_zero(priv_key)) ;
 
-    if (dsa->pub_key == NULL) {
-        if ((pub_key = BN_new()) == NULL)
-            goto err;
-    } else
-        pub_key = dsa->pub_key;
-
+    if (dsa->type == kDSA)
     {
-        BIGNUM *prk = BN_new();
+        if (dsa->pub_key == NULL) {
+            if ((pub_key = BN_new()) == NULL)
+                goto err;
+        } else
+            pub_key = dsa->pub_key;
 
-        if (prk == NULL)
-            goto err;
-        BN_with_flags(prk, priv_key, BN_FLG_CONSTTIME);
+        {
+            BIGNUM *prk = BN_new();
 
-        if (!BN_mod_exp(pub_key, dsa->g, prk, dsa->p, ctx)) {
+            if (prk == NULL)
+                goto err;
+            BN_with_flags(prk, priv_key, BN_FLG_CONSTTIME);
+
+            if (!BN_mod_exp(pub_key, dsa->g, prk, dsa->p, ctx)) {
+                BN_free(prk);
+                goto err;
+            }
+            /* We MUST free prk before any further use of priv_key */
             BN_free(prk);
+        }
+    }
+    else if (dsa->type == kSCHNORR)
+    {
+        if (dsa->pub_key == NULL) {
+            if ((pub_key = BN_new()) == NULL)
+                goto err;
+        }
+        else
+            pub_key = dsa->pub_key;
+
+        if (!BN_mod_exp(pub_key, dsa->g, priv_key, dsa->p, ctx)) {
             goto err;
         }
-        /* We MUST free prk before any further use of priv_key */
-        BN_free(prk);
     }
 
     dsa->priv_key = priv_key;

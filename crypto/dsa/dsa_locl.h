@@ -15,6 +15,7 @@ struct dsa_st {
      * This first variable is used to pick up errors where a DSA is passed
      * instead of of a EVP_PKEY
      */
+    int type;
     int pad;
     int32_t version;
     BIGNUM *p;
@@ -36,6 +37,11 @@ struct dsa_st {
 struct DSA_SIG_st {
     BIGNUM *r;
     BIGNUM *s;
+};
+
+struct SCHNORR_SIG_st {
+    BIGNUM *s;
+    BIGNUM *e;
 };
 
 struct dsa_method {

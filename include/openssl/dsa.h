@@ -62,7 +62,13 @@ extern "C" {
 /* typedef struct dsa_st DSA; */
 /* typedef struct dsa_method DSA_METHOD; */
 
+enum dsa_type {
+    kDSA,
+    kSCHNORR
+};
+
 typedef struct DSA_SIG_st DSA_SIG;
+typedef struct SCHNORR_SIG_st SCHNORR_SIG;
 
 # define d2i_DSAparams_fp(fp,x) (DSA *)ASN1_d2i_fp((char *(*)())DSA_new, \
                 (char *(*)())d2i_DSAparams,(fp),(unsigned char **)(x))
@@ -91,6 +97,7 @@ int DSA_set_method(DSA *dsa, const DSA_METHOD *);
 const DSA_METHOD *DSA_get_method(DSA *d);
 
 DSA *DSA_new(void);
+void DSA_set_mode(DSA* dsa, int type);
 DSA *DSA_new_method(ENGINE *engine);
 void DSA_free(DSA *r);
 /* "up" the DSA object's reference count */
